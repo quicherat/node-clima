@@ -2,12 +2,21 @@
 
 import * as fs from 'fs';
 import axios from 'axios';
+import { titulando } from '../helpers/titulando.js';
 export class Busquedas{
     historial = [];
     dbPath = './db/database.json';
 
     constructor() {
-        //TODO leer DB si existe
+        this.leerDB();
+    }
+
+    get historialCapitalizado() {
+        this.historial.forEach( (lugar, i) => {
+            const idx = `${i + 1}.`.brightGreen;
+            console.log(`${idx} ${titulando(lugar)}`);
+        })
+        return this.historial;
     }
 
     get paramsMapbox() {
@@ -71,7 +80,7 @@ export class Busquedas{
 
 
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
@@ -80,6 +89,9 @@ export class Busquedas{
         if( this.historial.includes(lugar.toLocaleLowerCase())){
             return
         }
+
+        //Reservamos sólo 6 búsquedas en el historial
+        this.historial = this.historial.splice(0,5);
 
          //Agregar duplicados
          this.historial.unshift( lugar.toLocaleLowerCase());
@@ -98,6 +110,12 @@ export class Busquedas{
 
     leerDB() {
 
+        if (fs.existsSync(this.dbPath)) return
+
+        const info = fs.readFileSync(this.dbPath, {encoding: 'utf-8'});
+        const data = JSON.parse(info);
+        this.historial = [...data.historial];
+         
     }
 
 
