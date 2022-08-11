@@ -1,8 +1,10 @@
 
-// import * as axios from 'axios';
+
+import * as fs from 'fs';
 import axios from 'axios';
 export class Busquedas{
-    historial = ['Tegucigalpa', 'Madrid', 'San José'];
+    historial = [];
+    dbPath = './db/database.json';
 
     constructor() {
         //TODO leer DB si existe
@@ -71,6 +73,31 @@ export class Busquedas{
         } catch (error) {
             console.log(error)
         }
+    }
+
+    agregarHistorial(lugar = '') {
+         
+        if( this.historial.includes(lugar.toLocaleLowerCase())){
+            return
+        }
+
+         //Agregar duplicados
+         this.historial.unshift( lugar.toLocaleLowerCase());
+
+         //Grabar en DB
+        this.guardarDB();
+    }
+
+    guardarDB() {
+        const payLoad = {
+            historial: this.historial
+        };
+
+        fs.writeFileSync( this.dbPath, JSON.stringify(payLoad));
+    }
+
+    leerDB() {
+
     }
 
 
